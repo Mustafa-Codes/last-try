@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
         body {
             display: flex;
@@ -24,7 +24,9 @@
             text-align: center;
         }
         #qrcode {
-            margin: 20px 0;
+            margin: 20px auto;
+            padding: 10px;
+            background: white;
         }
         h1 {
             color: #ff1493;
@@ -33,6 +35,10 @@
         p {
             color: #666;
             margin-top: 1rem;
+        }
+        canvas {
+            border: 1px solid #ff1493;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -44,17 +50,17 @@
     </div>
 
     <script>
-        const url = 'https://mustafa-codes.github.io/last-try/';
-        QRCode.toCanvas(document.getElementById('qrcode'), url, {
-            width: 200,
-            margin: 2,
-            color: {
-                dark: '#ff1493',
-                light: '#ffffff'
-            }
-        }, function (error) {
-            if (error) console.error(error);
-        });
+        window.onload = function() {
+            const url = 'https://mustafa-codes.github.io/last-try/';
+            new QRCode(document.getElementById("qrcode"), {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark: "#ff1493",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
     </script>
 </body>
 </html> 
