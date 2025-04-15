@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To The Girl Of My Dreams</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="fireworks">
+        <div class="firework"></div>
+        <div class="firework"></div>
+        <div class="firework"></div>
+        <div class="firework"></div>
+        <div class="firework"></div>
+    </div>
+    <div id="splash-screen" class="splash-screen">
+        <div class="background-image"></div>
+        <div class="content-container">
+            <img src="pic1.JPG" alt="Splash Image" class="splash-image">
+            <button id="startButton" class="start-button"><span>Start</span></button>
+        </div>
+    </div>
+    <div class="credits-container" style="display: none;">
+        <div class="credits">
+            <p>ashwaqmunye from the bottom of my heart, I'm sorry for how I acted towards you.</p>
+            <p>I want nothing more than to make you the happiest girl in the world and become someone you're proud to have in your life.</p>
+            <p>I'm genuinely in an impossible situation where I know I will never find something like this again and the fear of messing it up makes me do some stupid things.</p>
+            <p>Looks will fade and I need you to know that even when we're in our 50's you'd still be this special to me because the value you bring to my life has nothing to do with your looks walahi.</p>
+            <p>We're still young. Nothing worth having comes easy and we have so much time to build something together.</p>
+            <p>I keep making mistakes but I know you see me trying. Let this be a promise that whatever happens I will always do my best to make things right.</p>
+            <p>I know you thought highly of me at one point and I ended up disappointing you. But I know I can be even better than that if I'm just given an honest chance without being confused all the time.</p>
+            <p>Even if you did make some mistakes you didn't deserve any of the things I said or did. I have nothing but respect for you.</p>
+            <p class="final-message">Pls, forgive me.</p>
+        </div>
+    </div>
+    <audio id="audioPlayer" preload="auto">
+        <source src="Somebody.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const splashScreen = document.getElementById('splash-screen');
+            const startButton = document.getElementById('startButton');
+            const creditsContainer = document.querySelector('.credits-container');
+            const audioPlayer = document.getElementById('audioPlayer');
+            
+            // Handle start button click
+            startButton.addEventListener('click', function() {
+                // Hide splash screen
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    // Show credits
+                    creditsContainer.style.display = 'block';
+                }, 500);
+                
+                // Start audio with user interaction
+                audioPlayer.volume = 0;
+                audioPlayer.currentTime = 120; // Start from 2 minutes
+                
+                // Try to play immediately
+                const playPromise = audioPlayer.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        // If autoplay fails, show a message
+                        console.log("Auto-play was prevented. Please tap the screen to start music.");
+                        // Add a message to the credits container
+                        const message = document.createElement('div');
+                        message.className = 'tap-message';
+                        message.textContent = 'Tap anywhere to start music';
+                        creditsContainer.appendChild(message);
+                        
+                        // Add click handler to start music
+                        creditsContainer.addEventListener('click', function startMusic() {
+                            audioPlayer.play();
+                            message.remove();
+                            creditsContainer.removeEventListener('click', startMusic);
+                        });
+                    });
+                }
+                
+                // Fade in audio
+                let fadeInInterval = setInterval(() => {
+                    if (audioPlayer.volume < 0.3) {
+                        audioPlayer.volume += 0.01;
+                    } else {
+                        clearInterval(fadeInInterval);
+                    }
+                }, 100);
+                
+                // Loop between 2 and 3 minutes
+                audioPlayer.addEventListener('timeupdate', () => {
+                    if (audioPlayer.currentTime >= 180) { // 3 minutes
+                        audioPlayer.currentTime = 120; // Back to 2 minutes
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        class Firework {
+            constructor(x, y, targetX, targetY, color) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.color = color;
+                this.distance = Math.sqrt(Math.pow(targetX - x, 2) + Math.pow(targetY - y, 2));
+                this.speed = 2;
+                this.angle = Math.atan2(targetY - y, targetX - x);
+                this.velocity = {
+                    x: Math.cos(this.angle) * this.speed,
+                    y: Math.sin(this.angle) * this.speed
+                };
+                this.trail = [];
+                this.particles = [];
+                this.exploded = false;
+            }
+
+            update() {
+                if (!this.exploded) {
+                    this.trail.push({ x: this.x, y: this.y });
+                    if (this.trail.length > 10) this.trail.shift();
+
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+
+                    const distance = Math.sqrt(Math.pow(this.targetX - this.x, 2) + Math.pow(this.targetY - this.y, 2));
+                    if (distance < 5) {
+                        this.explode();
+                    }
+                } else {
+                    this.particles.forEach((particle, index) => {
+                        particle.x += particle.velocity.x;
+                        particle.y += particle.velocity.y;
+                        particle.velocity.y += 0.05; // gravity
+                        particle.alpha -= 0.01;
+                        if (particle.alpha <= 0) {
+                            this.particles.splice(index, 1);
+                        }
+                    });
+                }
+            }
+
+            explode() {
+                this.exploded = true;
+                for (let i = 0; i < 100; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5 + 2;
+                    this.particles.push({
+                        x: this.x,
+                        y: this.y,
+                        velocity: {
+                            x: Math.cos(angle) * speed,
+                            y: Math.sin(angle) * speed
+                        },
+                        alpha: 1,
+                        color: this.color
+                    });
+                }
+            }
+
+            draw(ctx) {
+                if (!this.exploded) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+
+                    // Draw trail
+                    this.trail.forEach((point, index) => {
+                        ctx.beginPath();
+                        ctx.arc(point.x, point.y, 1, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(255, 255, 255, ${index / this.trail.length})`;
+                        ctx.fill();
+                    });
+                } else {
+                    this.particles.forEach(particle => {
+                        ctx.beginPath();
+                        ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${this.hexToRgb(particle.color)}, ${particle.alpha})`;
+                        ctx.fill();
+                    });
+                }
+            }
+
+            hexToRgb(hex) {
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+                return `${r}, ${g}, ${b}`;
+            }
+        }
+
+        class FireworksSystem {
+            constructor() {
+                this.canvas = document.createElement('canvas');
+                this.canvas.style.position = 'fixed';
+                this.canvas.style.top = '0';
+                this.canvas.style.left = '0';
+                this.canvas.style.width = '100%';
+                this.canvas.style.height = '100%';
+                this.canvas.style.pointerEvents = 'none';
+                this.canvas.style.zIndex = '1';
+                document.body.appendChild(this.canvas);
+
+                this.ctx = this.canvas.getContext('2d');
+                this.fireworks = [];
+                this.colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                this.animate();
+                this.launchFirework();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            launchFirework() {
+                const x = Math.random() * this.canvas.width;
+                const y = this.canvas.height;
+                const targetX = Math.random() * this.canvas.width;
+                const targetY = Math.random() * this.canvas.height * 0.5;
+                const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                
+                this.fireworks.push(new Firework(x, y, targetX, targetY, color));
+                
+                setTimeout(() => this.launchFirework(), Math.random() * 2000 + 1000);
+            }
+
+            animate() {
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.fireworks.forEach((firework, index) => {
+                    firework.update();
+                    firework.draw(this.ctx);
+                    
+                    if (firework.exploded && firework.particles.length === 0) {
+                        this.fireworks.splice(index, 1);
+                    }
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Start the fireworks system
+        new FireworksSystem();
+    </script>
+</body>
+</html> 
