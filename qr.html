@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        #qrcode {
+            margin: 20px 0;
+        }
+        h1 {
+            color: #ff1493;
+            margin-bottom: 1rem;
+        }
+        p {
+            color: #666;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scan to Visit</h1>
+        <div id="qrcode"></div>
+        <p>https://mustafa-codes.github.io/last-try/</p>
+    </div>
+
+    <script>
+        const url = 'https://mustafa-codes.github.io/last-try/';
+        QRCode.toCanvas(document.getElementById('qrcode'), url, {
+            width: 200,
+            margin: 2,
+            color: {
+                dark: '#ff1493',
+                light: '#ffffff'
+            }
+        }, function (error) {
+            if (error) console.error(error);
+        });
+    </script>
+</body>
+</html> 
