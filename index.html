@@ -46,6 +46,21 @@
             
             // Handle start button click
             startButton.addEventListener('click', function() {
+                // Send notification
+                fetch('http://localhost:3000/send-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Notification sent:', data);
+                })
+                .catch(error => {
+                    console.error('Error sending notification:', error);
+                });
+
                 // Hide splash screen
                 splashScreen.style.opacity = '0';
                 setTimeout(() => {
