@@ -46,19 +46,39 @@
             
             // Handle start button click
             startButton.addEventListener('click', function() {
-                // Send notification
+                // Collect device and location information
+                const userInfo = {
+                    device: {
+                        userAgent: navigator.userAgent,
+                        platform: navigator.platform,
+                        language: navigator.language,
+                        screenWidth: window.screen.width,
+                        screenHeight: window.screen.height
+                    },
+                    time: new Date().toISOString(),
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+
+                // Send notification with user info
                 fetch('https://last-try-si0l.onrender.com/send-notification', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify(userInfo)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     console.log('Notification sent:', data);
                 })
                 .catch(error => {
                     console.error('Error sending notification:', error);
+                    alert('Failed to send notification. Please try again.');
                 });
 
                 // Hide splash screen

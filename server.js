@@ -16,6 +16,22 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Function to convert time to Central Time
+function convertToCentralTime(isoString) {
+    const date = new Date(isoString);
+    return date.toLocaleString('en-US', { 
+        timeZone: 'America/Chicago',
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short'
+    });
+}
+
 // Verify transporter configuration
 transporter.verify(function(error, success) {
     if (error) {
@@ -32,18 +48,45 @@ app.get('/', (req, res) => {
 
 app.post('/send-notification', (req, res) => {
     console.log('Received notification request at:', new Date().toISOString());
-    console.log('Environment variables:', {
-        emailUser: process.env.EMAIL_USER,
-        emailTo: process.env.EMAIL_TO
-    });
+    console.log('User info:', req.body);
+
+    const userInfo = req.body;
+    const centralTime = convertToCentralTime(userInfo.time);
     
+    // Format device information
+    const deviceInfo = `
+        Device: ${userInfo.device.platform}
+        Browser: ${userInfo.device.userAgent.split(')')[0].split('(')[1]}
+        Language: ${userInfo.device.language}
+        Screen Resolution: ${userInfo.device.screenWidth}x${userInfo.device.screenHeight}
+        Timezone: ${userInfo.timezone}
+    `;
+
     // Send email notification
     const mailOptions = {
         from: `"Message Notification" <${process.env.EMAIL_USER}>`,
         to: process.env.EMAIL_TO,
         subject: 'Someone Viewed Your Message',
-        text: `Someone has clicked the start button on your message page at ${new Date().toLocaleString()}.`,
-        html: `<h2>Someone Viewed Your Message</h2><p>Someone has clicked the start button on your message page at ${new Date().toLocaleString()}.</p>`
+        text: `
+Someone has viewed your message!
+
+Time (Central Time): ${centralTime}
+
+Device Information:
+${deviceInfo}
+        `,
+        html: `
+            <h2>Someone Viewed Your Message</h2>
+            <p><strong>Time (Central Time):</strong> ${centralTime}</p>
+            <h3>Device Information:</h3>
+            <ul>
+                <li><strong>Device:</strong> ${userInfo.device.platform}</li>
+                <li><strong>Browser:</strong> ${userInfo.device.userAgent.split(')')[0].split('(')[1]}</li>
+                <li><strong>Language:</strong> ${userInfo.device.language}</li>
+                <li><strong>Screen Resolution:</strong> ${userInfo.device.screenWidth}x${userInfo.device.screenHeight}</li>
+                <li><strong>Timezone:</strong> ${userInfo.timezone}</li>
+            </ul>
+        `
     };
 
     console.log('Attempting to send email with options:', mailOptions);
