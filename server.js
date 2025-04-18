@@ -25,19 +25,28 @@ transporter.verify(function(error, success) {
     }
 });
 
+// Root route to confirm server is working
+app.get('/', (req, res) => {
+    res.json({ status: 'Server is running', message: 'Email notification service is active' });
+});
+
 app.post('/send-notification', (req, res) => {
     console.log('Received notification request at:', new Date().toISOString());
+    console.log('Environment variables:', {
+        emailUser: process.env.EMAIL_USER,
+        emailTo: process.env.EMAIL_TO
+    });
     
     // Send email notification
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: `"Message Notification" <${process.env.EMAIL_USER}>`,
         to: process.env.EMAIL_TO,
         subject: 'Someone Viewed Your Message',
         text: `Someone has clicked the start button on your message page at ${new Date().toLocaleString()}.`,
         html: `<h2>Someone Viewed Your Message</h2><p>Someone has clicked the start button on your message page at ${new Date().toLocaleString()}.</p>`
     };
 
-    console.log('Attempting to send email to:', process.env.EMAIL_TO);
+    console.log('Attempting to send email with options:', mailOptions);
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
